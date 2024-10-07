@@ -80,3 +80,5 @@ I offer consulting, freelance services, and full implementation for these advanc
 License
 This repository is open-source and provided for educational purposes. The scripts and configurations included here serve as a proof-of-concept and should be customized to fit your organization's specific requirements.
 
+![qr-code (4)](https://github.com/user-attachments/assets/f7b6181c-e1bc-495d-be3d-7d1fff3b3ce2)
+
