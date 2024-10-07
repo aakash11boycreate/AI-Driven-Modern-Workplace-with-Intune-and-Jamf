@@ -1,0 +1,37 @@
+{
+  "schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "actions": {
+    "share_threat_intel": {
+      "type": "HTTP",
+      "inputs": {
+        "method": "POST",
+        "uri": "https://api.crowdstrike.com/indicators",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer your-api-key"
+        },
+        "body": {
+          "indicator": "@triggerBody()?['IoC']",
+          "threatLevel": "@triggerBody()?['Severity']"
+        }
+      }
+    },
+    "notify_team": {
+      "type": "SendEmail",
+      "inputs": {
+        "emailAddress": "securityteam@company.com",
+        "subject": "Threat Intel Shared",
+        "body": "Threat intelligence has been shared with external platforms for further action."
+      }
+    }
+  },
+  "triggers": {
+    "ThreatIntelAlert": {
+      "type": "Microsoft.Sentinel/alert",
+      "inputs": {
+        "severity": "High",
+        "category": "Threat Intelligence"
+      }
+    }
+  }
+}
