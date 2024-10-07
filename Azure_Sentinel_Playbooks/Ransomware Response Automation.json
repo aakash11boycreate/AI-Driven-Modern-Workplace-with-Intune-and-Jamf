@@ -1,0 +1,34 @@
+{
+  "schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "actions": {
+    "isolate_device": {
+      "type": "Microsoft.Sentinel/isolateMachine",
+      "inputs": {
+        "machineId": "@triggerBody()?['MachineId']"
+      }
+    },
+    "disable_user_account": {
+      "type": "AzureAD/blockUser",
+      "inputs": {
+        "userId": "@triggerBody()?['UserId']"
+      }
+    },
+    "notify_team": {
+      "type": "SendEmail",
+      "inputs": {
+        "emailAddress": "securityteam@company.com",
+        "subject": "Ransomware Detected",
+        "body": "A ransomware attack has been detected, the device has been isolated, and the user account has been disabled."
+      }
+    }
+  },
+  "triggers": {
+    "RansomwareAlert": {
+      "type": "Microsoft.Sentinel/alert",
+      "inputs": {
+        "severity": "Critical",
+        "category": "Ransomware"
+      }
+    }
+  }
+}
