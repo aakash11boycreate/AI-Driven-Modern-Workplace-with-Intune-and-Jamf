@@ -1,0 +1,37 @@
+{
+  "schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "actions": {
+    "isolate_device": {
+      "type": "Microsoft.Sentinel/isolateMachine",
+      "inputs": {
+        "machineId": "@triggerBody()?['MachineId']",
+        "isolationType": "Full",
+        "comment": "Isolated due to suspected phishing attack"
+      }
+    },
+    "block_sender": {
+      "type": "Office365/blockSender",
+      "inputs": {
+        "emailAddress": "@triggerBody()?['SenderEmail']",
+        "comment": "Blocking sender due to phishing alert"
+      }
+    },
+    "notify_security": {
+      "type": "SendEmail",
+      "inputs": {
+        "emailAddress": "securityteam@company.com",
+        "subject": "Phishing Incident Detected",
+        "body": "A phishing email has been detected and the affected machine has been isolated."
+      }
+    }
+  },
+  "triggers": {
+    "PhishingAlert": {
+      "type": "Microsoft.Sentinel/alert",
+      "inputs": {
+        "severity": "High",
+        "category": "Phishing"
+      }
+    }
+  }
+}
