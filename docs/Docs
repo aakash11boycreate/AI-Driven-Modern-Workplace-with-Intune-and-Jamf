@@ -1,0 +1,112 @@
+AI-Driven Modern Workplace with Intune and Jamf: Documentation
+Overview
+This project focuses on building a modern workplace that leverages AI-driven automation, Microsoft Intune, Jamf Pro, and Azure Sentinel. It includes scripts for managing macOS and Windows devices, enforcing security policies, and integrating cross-platform management for an optimized, secure environment.
+
+Structure:
+Scripts/:
+AppleScripts/: Scripts for automating tasks on macOS.
+ShellScripts/: Shell scripts for macOS security and system configuration.
+Intune_Policies/: Policies for managing Windows and macOS devices through Microsoft Intune.
+Jamf_Scripts/: Scripts for enforcing policies and managing macOS devices via Jamf Pro.
+Azure_Sentinel_Playbooks/: Playbooks for automating incident responses and threat intelligence sharing using Azure Sentinel.
+1. Scripts/
+1.1 AppleScripts/
+Slack_Install.applescript
+Purpose: Automates the installation of Slack on macOS devices via Jamf.
+Functionality: This AppleScript installs the Slack app for macOS without user interaction, ensuring it is silently deployed across managed devices.
+  
+  tell application "System Events"
+    display dialog "Installing Slack..."
+end tell
+
+do shell script "curl -O https://downloads.slack-edge.com/mac_releases/Slack-4.0.0.dmg"
+do shell script "hdiutil attach Slack-4.0.0.dmg"
+do shell script "cp -R /Volumes/Slack/Slack.app /Applications"
+do shell script "hdiutil detach /Volumes/Slack"
+
+  1.2 ShellScripts/
+Firewall_Enable.sh
+Purpose: This script enables the firewall on macOS devices and ensures all incoming connections are blocked for enhanced security.
+Functionality: The script is deployed via Jamf or manually and ensures that firewall settings are consistently applied across the enterprise.
+
+  #!/bin/bash
+
+echo "Enabling firewall and blocking all incoming connections..."
+
+# Enable firewall
+sudo /usr/bin/defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+
+# Block all incoming connections
+sudo /usr/bin/defaults write /Library/Preferences/com.apple.alf allowsignedenabled -bool false
+
+# Confirm firewall settings
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+
+
+  2. Intune_Policies/
+macOS Compliance Policy with Intune and Jamf Integration
+Purpose: This policy ensures that all macOS devices meet compliance requirements such as encryption (FileVault) and are running the latest OS version.
+Functionality: This policy integrates with Jamf Pro to sync compliance status between Intune and Jamf.
+Key Compliance Requirements:
+
+FileVault Encryption: Enforced on all macOS devices.
+OS Version: macOS devices must be running at least version 11.0.
+Password Complexity: Minimum 8 characters, with at least one uppercase, one lowercase, and one number.
+3. Jamf_Scripts/
+macOS Compliance Sync with Intune
+Purpose: This script syncs the compliance status of macOS devices from Jamf to Intune, ensuring that devices are properly enrolled and compliant across both platforms.
+Functionality: Automates the process of syncing device status, making it easier to maintain compliance in a hybrid Jamf-Intune environment.
+
+  #!/bin/bash
+
+# Ensure compliance sync between Jamf and Intune
+jamf recon
+sudo jamf policy -event syncWithIntune
+echo "macOS device compliance synced with Intune."
+
+
+  4. Azure_Sentinel_Playbooks/
+4.1 Phishing Email Response Playbook
+Purpose: Automatically responds to a phishing email detected by Azure Sentinel by isolating the affected device, blocking the sender in Office 365, and notifying the security team.
+Functionality: The playbook ensures an automated response to phishing attempts, mitigating potential security risks without manual intervention.
+Key Actions:
+
+Device Isolation: Isolate the device to prevent further damage.
+Block Email Sender: Automatically block the phishing email sender in Office 365.
+Notify Security Team: Send an alert to the security team for follow-up.
+
+  {
+  "actions": {
+    "isolate_device": {
+      "type": "Microsoft.Sentinel/isolateMachine",
+      "inputs": {
+        "machineId": "@triggerBody()?['MachineId']"
+      }
+    },
+    "block_sender": {
+      "type": "Office365/blockSender",
+      "inputs": {
+        "emailAddress": "@triggerBody()?['SenderEmail']"
+      }
+    },
+    "notify_team": {
+      "type": "SendEmail",
+      "inputs": {
+        "emailAddress": "securityteam@company.com",
+        "subject": "Phishing Incident Detected",
+        "body": "A phishing email has been detected and the affected machine has been isolated."
+      }
+    }
+  }
+}
+
+
+Conclusion
+The AI-Driven Modern Workplace with Intune and Jamf project combines the power of automation, security, and cross-platform management to provide an optimized, scalable, and secure digital environment. These sample scripts, policies, and playbooks showcase the advanced capabilities of a modern IT infrastructure, highlighting best practices in security, compliance, and incident response.
+
+For full implementation and customization, consultancy services are available to ensure a seamless and secure transition to a modern workplace.
+
+Contact Information:
+LinkedIn: Aakash Rahsi
+GitHub: GitHub Repository
+Email: contact@aakashrahsi.online
